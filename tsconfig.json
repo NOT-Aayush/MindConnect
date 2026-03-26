@@ -6,7 +6,6 @@
     "module": "ESNext",
     "skipLibCheck": true,
 
-    /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
@@ -17,28 +16,20 @@
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
 
-    /* Linting */
     "strict": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noImplicitAny": false,
-    "noFallthroughCasesInSwitch": false,
-    "strictNullChecks": false,
 
-    /* Path mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./client/*"],
-      "@shared/*": ["./shared/*"]
+      "@shared/*": ["./shared/*"],
+      "@api/*": ["./api/*"]   // ✅ optional but useful
     }
   },
   "include": [
     "client/**/*",
-    "server/**/*",
     "shared/**/*",
-    "api/**/*",
-    "vite.config.ts",
-    "vite.config.server.ts"
+    "api/**/*",        // ✅ backend now lives here
+    "vite.config.ts"
   ],
   "exclude": ["node_modules", "dist"]
 }
