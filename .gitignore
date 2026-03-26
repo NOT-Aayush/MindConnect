@@ -26,5 +26,4 @@ dist-ssr
 .config/
 !.env
 ".env" 
-".env" 
-".env" 
+
