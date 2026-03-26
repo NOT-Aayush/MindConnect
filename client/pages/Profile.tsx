@@ -121,6 +121,10 @@ export default function ProfilePage() {
       
       if (res.ok) {
         setDoctors(doctors.filter(d => d.id !== doctorId));
+        // Also refresh admin stats to update doctor count
+        if (adminStats) {
+          setAdminStats(prev => prev ? { ...prev, doctors: prev.doctors - 1 } : null);
+        }
         alert("Doctor deleted successfully");
       } else {
         const error = await res.json();
@@ -279,7 +283,7 @@ export default function ProfilePage() {
               <h3 className="font-semibold">Manage Doctors</h3>
               <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
                 {doctors.slice(0, 10).map((doctor) => (
-                  <div key={doctor.id} className="rounded-md border p-3">
+                  <div key={doctor.id} className="rounded-md border border-border bg-card p-3">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
                         <div className="text-sm font-medium">{doctor.name}</div>
@@ -292,7 +296,7 @@ export default function ProfilePage() {
                       </div>
                       <button
                         onClick={() => deleteDoctor(doctor.id)}
-                        className="text-red-500 hover:text-red-700 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50"
+                        className="text-destructive hover:text-destructive/80 hover:bg-destructive/10 text-sm px-2 py-1 rounded border border-border transition-colors"
                       >
                         Delete
                       </button>

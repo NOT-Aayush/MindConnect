@@ -1,8 +1,10 @@
 import { blogPosts } from "@/data/blog";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function StoriesPage() {
   const [topDoctors, setTopDoctors] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchTopDoctors() {
@@ -18,6 +20,10 @@ export default function StoriesPage() {
     }
     fetchTopDoctors();
   }, []);
+
+  const handleBook = (doctor: any) => {
+    navigate(`/doctors?city=${encodeURIComponent(doctor.city)}#doctor-${doctor.id}`);
+  };
 
   return (
     <main className="container py-12">
@@ -59,6 +65,14 @@ export default function StoriesPage() {
               </div>
               <div className="mt-3 text-sm text-muted-foreground">
                 Languages: {doctor.languages}
+              </div>
+              <div className="mt-4">
+                <button
+                  onClick={() => handleBook(doctor)}
+                  className="w-full rounded-md bg-primary px-4 py-2 text-sm text-primary-foreground hover:bg-primary/90 transition-colors"
+                >
+                  Book Appointment
+                </button>
               </div>
             </div>
           ))}
