@@ -8,6 +8,7 @@ export default function ProfilePage() {
   const [adminUsers, setAdminUsers] = useState<any[]>([]);
   const [adminBookings, setAdminBookings] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
+  const [doctorsByCity, setDoctorsByCity] = useState<Record<string, number>>({});
 
   const [editing, setEditing] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
@@ -71,7 +72,15 @@ export default function ProfilePage() {
         }
         if (doctorsRes.ok) {
           const json = await doctorsRes.json();
-          setDoctors(json.doctors ?? []);
+          const doctorsData = json.doctors ?? [];
+          setDoctors(doctorsData);
+          
+          // Calculate city-wise distribution
+          const cityDistribution = doctorsData.reduce((acc: Record<string, number>, doctor: any) => {
+            acc[doctor.city] = (acc[doctor.city] || 0) + 1;
+            return acc;
+          }, {});
+          setDoctorsByCity(cityDistribution);
         }
       } catch (e) {
         console.error(e);
@@ -120,7 +129,21 @@ export default function ProfilePage() {
       });
       
       if (res.ok) {
+        const deletedDoctor = doctors.find(d => d.id === doctorId);
         setDoctors(doctors.filter(d => d.id !== doctorId));
+        
+        // Update city distribution
+        if (deletedDoctor) {
+          setDoctorsByCity(prev => {
+            const newDist = { ...prev };
+            newDist[deletedDoctor.city] = (newDist[deletedDoctor.city] || 0) - 1;
+            if (newDist[deletedDoctor.city] <= 0) {
+              delete newDist[deletedDoctor.city];
+            }
+            return newDist;
+          });
+        }
+        
         // Also refresh admin stats to update doctor count
         if (adminStats) {
           setAdminStats(prev => prev ? { ...prev, doctors: prev.doctors - 1 } : null);
@@ -281,7 +304,25 @@ export default function ProfilePage() {
 
             <div>
               <h3 className="font-semibold">Manage Doctors</h3>
-              <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
+              
+              {/* City-wise Distribution */}
+              <div className="mt-3 mb-4">
+                <h4 className="text-sm font-medium text-muted-foreground mb-2">City Distribution</h4>
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(doctorsByCity).length === 0 ? (
+                    <span className="text-xs text-muted-foreground">No doctors available</span>
+                  ) : (
+                    Object.entries(doctorsByCity).map(([city, count]) => (
+                      <div key={city} className="rounded-md bg-muted px-2 py-1 text-xs">
+                        {city}: {count}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {/* Doctors List */}
+              <div className="space-y-2 max-h-64 overflow-y-auto">
                 {doctors.slice(0, 10).map((doctor) => (
                   <div key={doctor.id} className="rounded-md border border-border bg-card p-3">
                     <div className="flex items-center justify-between">

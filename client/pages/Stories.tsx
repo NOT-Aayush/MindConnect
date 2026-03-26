@@ -1,24 +1,37 @@
-import { blogPosts } from "@/data/blog";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function StoriesPage() {
   const [topDoctors, setTopDoctors] = useState<any[]>([]);
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchTopDoctors() {
+    async function fetchData() {
       try {
-        const res = await fetch('/api/doctors');
-        if (res.ok) {
-          const json = await res.json();
-          setTopDoctors(json.doctors?.slice(0, 3) || []);
+        setLoading(true);
+        const [doctorsRes, blogsRes] = await Promise.all([
+          fetch('/api/doctors'),
+          fetch('/api/blogs'),
+        ]);
+
+        if (doctorsRes.ok) {
+          const doctorsJson = await doctorsRes.json();
+          setTopDoctors(doctorsJson.doctors?.slice(0, 3) || []);
+        }
+
+        if (blogsRes.ok) {
+          const blogsJson = await blogsRes.json();
+          setBlogPosts(blogsJson.blogs || []);
         }
       } catch (error) {
-        console.error('Failed to fetch top doctors:', error);
+        console.error('Failed to fetch data:', error);
+      } finally {
+        setLoading(false);
       }
     }
-    fetchTopDoctors();
+    fetchData();
   }, []);
 
   const handleBook = (doctor: any) => {
@@ -80,20 +93,28 @@ export default function StoriesPage() {
       </section>
 
       <section className="grid gap-6 md:grid-cols-3">
-        {blogPosts.map((b) => (
-          <article key={b.id} className="bg-card dark:bg-card rounded-lg shadow-md overflow-hidden">
-            {b.cover && (
-              <div className="h-48 w-full overflow-hidden">
-                <img src={b.cover} alt={b.title} className="h-full w-full object-cover" />
+        {loading ? (
+          <div className="col-span-full text-center text-sm text-muted-foreground">Loading stories...</div>
+        ) : blogPosts.length === 0 ? (
+          <div className="col-span-full text-center text-sm text-muted-foreground">No stories available yet.</div>
+        ) : (
+          blogPosts.map((b) => (
+            <article key={b.id} className="bg-card rounded-lg shadow-md overflow-hidden">
+              {b.cover && (
+                <div className="h-48 w-full overflow-hidden">
+                  <img src={b.cover} alt={b.title} className="h-full w-full object-cover" />
+                </div>
+              )}
+              <div className="p-6">
+                <p className="text-xs text-muted-foreground">
+                  {new Date(b.createdAt).toLocaleDateString()} • {b.role}
+                </p>
+                <h3 className="mt-2 text-xl font-semibold">{b.title}</h3>
+                <p className="mt-3 text-sm text-muted-foreground line-clamp-4">{b.excerpt}</p>
               </div>
-            )}
-            <div className="p-6">
-              <p className="text-xs text-muted-foreground">{new Date(b.date).toLocaleDateString()} • {b.role}</p>
-              <h3 className="mt-2 text-xl font-semibold">{b.title}</h3>
-              <p className="mt-3 text-sm text-muted-foreground line-clamp-4">{b.excerpt}</p>
-            </div>
-          </article>
-        ))}
+            </article>
+          ))
+        )}
       </section>
 
       <section className="mt-12">
