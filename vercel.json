@@ -2,6 +2,7 @@
   "buildCommand": "npm run build:client",
   "outputDirectory": "dist/spa",
   "installCommand": "npm install",
+  "packageManager": "npm",
   "rewrites": [
     {
       "source": "/((?!api|_next/static|_next/image|favicon.ico).*)",
