@@ -1,7 +1,48 @@
 import { PrismaClient } from "@prisma/client";
-import { doctors as staticDoctors, generateSlots } from "../client/data/doctors";
 
 const prisma = new PrismaClient();
+
+// Static doctor data
+const staticDoctors = [
+  {
+    name: "Dr. Sarah Johnson",
+    city: "Delhi",
+    specialty: "Psychologist",
+    experienceYears: 8,
+    background: "Expert in anxiety and depression",
+    feesINR: 1500,
+    languages: ["English", "Hindi"],
+    rating: 4.8,
+    avatarUrl: null
+  },
+  {
+    name: "Dr. Michael Chen",
+    city: "Mumbai",
+    specialty: "Psychiatrist",
+    experienceYears: 12,
+    background: "Specializes in mood disorders",
+    feesINR: 2000,
+    languages: ["English", "Hindi"],
+    rating: 4.9,
+    avatarUrl: null
+  }
+];
+
+function generateSlots() {
+  const slots = [];
+  const now = new Date();
+  for (let i = 0; i < 7; i++) {
+    const date = new Date(now);
+    date.setDate(date.getDate() + i);
+    for (let hour = 9; hour <= 17; hour++) {
+      slots.push({
+        start: new Date(date.setHours(hour, 0, 0, 0)),
+        end: new Date(date.setHours(hour, 0, 0, 0)),
+      });
+    }
+  }
+  return slots;
+}
 
 async function main() {
   console.log("Seeding database...");

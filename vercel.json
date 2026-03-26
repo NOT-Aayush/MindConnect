@@ -2,11 +2,6 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist/spa",
   "installCommand": "npm install",
-  "functions": {
-    "api/index.ts": {
-      "includeFiles": "{server/**,shared/**,prisma/**}"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
