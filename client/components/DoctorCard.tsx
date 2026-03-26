@@ -25,14 +25,14 @@ export function DoctorCard({ doctor, onBook }: { doctor: Doctor; onBook?: (d: Do
   }
 
   return (
-    <div className="group rounded-2xl overflow-hidden bg-gradient-to-b from-white to-emerald-50 shadow-lg transition-transform hover:-translate-y-1">
+    <div className="group rounded-2xl overflow-hidden bg-gradient-to-b from-card to-muted shadow-lg transition-transform hover:-translate-y-1">
       <div className="relative h-40 w-full overflow-hidden">
         <img
           src={doctor.avatarUrl ?? "/placeholder.svg"}
           alt={doctor.name}
           className="h-full w-full object-cover"
         />
-        <div className="absolute left-3 bottom-3 rounded-md bg-white/80 dark:bg-white/10 px-3 py-1 text-sm font-semibold">{doctor.specialty}</div>
+        <div className="absolute left-3 bottom-3 rounded-md bg-background/80 backdrop-blur-sm px-3 py-1 text-sm font-semibold">{doctor.specialty}</div>
       </div>
       <div className="p-4 grid gap-2">
         <div className="flex items-start gap-3">

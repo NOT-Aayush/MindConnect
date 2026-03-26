@@ -7,7 +7,6 @@ import { useTheme } from "next-themes";
 
 const routes = [
   { to: "/doctors", label: "Doctors", icon: Stethoscope },
-  { to: "/appointments", label: "Appointments", icon: CalendarDays },
   { to: "/free-listeners", label: "Free Listeners", icon: Phone },
   { to: "/ai-counselor", label: "AI Counselor", icon: Brain },
   { to: "/#blog", label: "Blog", icon: BookOpen },
@@ -147,7 +146,7 @@ function NavItem({ label, items }: { label: string; items?: string[] }) {
         type="button"
         onClick={() => setOpenMenu((v) => !v)}
         aria-expanded={openMenu}
-        className="px-4 py-3 text-sm font-medium text-gray-900 flex items-center gap-2 dark:text-foreground"
+        className="px-4 py-3 text-sm font-medium flex items-center gap-2 hover:text-primary transition-colors"
       >
         {label}
       </button>
@@ -205,7 +204,7 @@ function UserMenu() {
   if (!user) {
     return (
       <div className="flex items-center">
-        <button onClick={openSignIn} className="rounded-md border px-3 py-2 text-sm">Sign in</button>
+        <button onClick={openSignIn} className="rounded-md border border-border bg-background px-3 py-2 text-sm hover:bg-muted/60 transition-colors">Sign in</button>
       </div>
     );
   }
@@ -214,7 +213,7 @@ function UserMenu() {
 
   return (
     <div className="relative">
-      <button onClick={() => setOpenMenu(v => !v)} className="inline-flex items-center gap-2 rounded-full border px-2 py-1">
+      <button onClick={() => setOpenMenu(v => !v)} className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-2 py-1 hover:bg-muted/60 transition-colors">
         <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center text-sm font-semibold">{initials}</div>
         <span className="hidden md:inline text-sm">{user.name}</span>
       </button>

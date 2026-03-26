@@ -132,30 +132,6 @@ export default function ProfilePage() {
     }
   }
 
-  async function deleteDoctorByName(name: string, city: string) {
-    if (!confirm(`Are you sure you want to delete doctor "${name}" from ${city}?`)) return;
-    
-    try {
-      const res = await fetchWithAuth("/api/admin/delete-doctor-by-name", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, city }),
-      });
-      
-      if (res.ok) {
-        const result = await res.json();
-        setDoctors(doctors.filter(d => d.name !== name || d.city !== city));
-        alert(`Successfully deleted ${result.deletedCount} doctor(s)`);
-      } else {
-        const error = await res.json();
-        alert(error.error || "Failed to delete doctor");
-      }
-    } catch (error) {
-      console.error("Delete doctor by name error:", error);
-      alert("Failed to delete doctor");
-    }
-  }
-
   return (
     <main className="container py-12">
       <div className="grid gap-6 md:grid-cols-3">
@@ -300,23 +276,7 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <div className="flex items-center justify-between gap-3">
-                <h3 className="font-semibold">Manage Doctors</h3>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => deleteDoctorByName("a", "Delhi")}
-                    className="text-sm text-red-600 hover:text-red-800 px-2 py-1 rounded border border-red-300 hover:bg-red-50"
-                  >
-                    Delete "a" from Delhi
-                  </button>
-                  <a
-                    href="/add-doctor"
-                    className="text-sm text-primary underline underline-offset-4"
-                  >
-                    Add doctor
-                  </a>
-                </div>
-              </div>
+              <h3 className="font-semibold">Manage Doctors</h3>
               <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
                 {doctors.slice(0, 10).map((doctor) => (
                   <div key={doctor.id} className="rounded-md border p-3">
