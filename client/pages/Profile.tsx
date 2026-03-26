@@ -10,6 +10,7 @@ export default function ProfilePage() {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [doctorsByCity, setDoctorsByCity] = useState<Record<string, number>>({});
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+  const [selectedCity, setSelectedCity] = useState<string | null>(null);
 
   // Auto-hide notification after 3 seconds
   useEffect(() => {
@@ -351,18 +352,44 @@ export default function ProfilePage() {
                   {Object.entries(doctorsByCity).length === 0 ? (
                     <span className="text-xs text-muted-foreground">No doctors available</span>
                   ) : (
-                    Object.entries(doctorsByCity).map(([city, count]) => (
-                      <div key={city} className="rounded-md bg-muted px-2 py-1 text-xs">
-                        {city}: {count}
-                      </div>
-                    ))
+                    <>
+                      {Object.entries(doctorsByCity).map(([city, count]) => (
+                        <button
+                          key={city}
+                          onClick={() => setSelectedCity(selectedCity === city ? null : city)}
+                          className={`rounded-md px-2 py-1 text-xs transition-colors cursor-pointer ${
+                            selectedCity === city
+                              ? 'bg-primary text-primary-foreground'
+                              : 'bg-muted hover:bg-muted/80'
+                          }`}
+                        >
+                          {city}: {count}
+                        </button>
+                      ))}
+                      {selectedCity && (
+                        <button
+                          onClick={() => setSelectedCity(null)}
+                          className="rounded-md px-2 py-1 text-xs bg-destructive text-destructive-foreground hover:bg-destructive/80 transition-colors"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </>
                   )}
                 </div>
+                {selectedCity && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Showing doctors in {selectedCity} ({doctorsByCity[selectedCity]} doctors)
+                  </p>
+                )}
               </div>
 
               {/* Doctors List */}
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {doctors.slice(0, 10).map((doctor) => (
+                {doctors
+                  .filter(doctor => !selectedCity || doctor.city === selectedCity)
+                  .slice(0, 10)
+                  .map((doctor) => (
                   <div key={doctor.id} className="rounded-md border border-border bg-card p-3">
                     <div className="flex items-center justify-between">
                       <div className="flex-1">
@@ -383,8 +410,10 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 ))}
-                {doctors.length === 0 && (
-                  <div className="text-sm text-muted-foreground">No doctors yet.</div>
+                {doctors.filter(doctor => !selectedCity || doctor.city === selectedCity).length === 0 && (
+                  <div className="text-sm text-muted-foreground">
+                    {selectedCity ? `No doctors in ${selectedCity}` : 'No doctors yet.'}
+                  </div>
                 )}
               </div>
             </div>
