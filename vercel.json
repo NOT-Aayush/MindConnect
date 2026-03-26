@@ -2,6 +2,12 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist/spa",
   "installCommand": "npm install",
+  "functions": {
+    "api/index.ts": {
+      "runtime": "nodejs18.x",
+      "includeFiles": ["server/**", "shared/**", "prisma/**"]
+    }
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",

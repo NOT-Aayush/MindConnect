@@ -76,30 +76,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
-    
-    const ct = res.headers.get("content-type") || "";
-    let responseBody: any;
-    
-    try {
-      if (ct.includes("application/json")) {
-        responseBody = await res.json();
-      } else {
-        responseBody = await res.text();
-      }
-    } catch {
-      responseBody = null;
-    }
-    
     if (!res.ok) {
-      throw new Error(responseBody?.error || responseBody || "Login failed");
+      let info: any = null;
+      try { info = await res.json(); } catch { info = await res.text(); }
+      throw new Error(info?.error || info || "Login failed");
     }
-    
+    const ct = res.headers.get("content-type") || "";
     if (ct.includes("application/json")) {
-      setToken(responseBody.token);
-      setUser(responseBody.user);
-      return responseBody.user as NonNullable<User>;
+      const json = await res.json();
+      setToken(json.token);
+      setUser(json.user);
+      return json.user as NonNullable<User>;
     } else {
-      throw new Error(responseBody || "Login failed");
+      const t = await res.text();
+      throw new Error(t || "Login failed");
     }
   }
 
@@ -109,30 +99,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    
-    const ct = res.headers.get("content-type") || "";
-    let responseBody: any;
-    
-    try {
-      if (ct.includes("application/json")) {
-        responseBody = await res.json();
-      } else {
-        responseBody = await res.text();
-      }
-    } catch {
-      responseBody = null;
-    }
-    
     if (!res.ok) {
-      throw new Error(responseBody?.error || responseBody || "Register failed");
+      let info: any = null;
+      try { info = await res.json(); } catch { info = await res.text(); }
+      throw new Error(info?.error || info || "Register failed");
     }
-    
+    const ct = res.headers.get("content-type") || "";
     if (ct.includes("application/json")) {
-      setToken(responseBody.token);
-      setUser(responseBody.user);
-      return responseBody.user as NonNullable<User>;
+      const json = await res.json();
+      setToken(json.token);
+      setUser(json.user);
+      return json.user as NonNullable<User>;
     } else {
-      throw new Error(responseBody || "Register failed");
+      const t = await res.text();
+      throw new Error(t || "Register failed");
     }
   }
 
