@@ -1,12 +1,69 @@
 import { blogPosts } from "@/data/blog";
+import { useEffect, useState } from "react";
 
 export default function StoriesPage() {
+  const [topDoctors, setTopDoctors] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function fetchTopDoctors() {
+      try {
+        const res = await fetch('/api/doctors');
+        if (res.ok) {
+          const json = await res.json();
+          setTopDoctors(json.doctors?.slice(0, 3) || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch top doctors:', error);
+      }
+    }
+    fetchTopDoctors();
+  }, []);
+
   return (
     <main className="container py-12">
       <header className="text-center mb-12">
         <h1 className="text-4xl font-bold">Stories & Insights</h1>
         <p className="text-sm text-muted-foreground mt-2">Articles from psychologists and lived experiences</p>
       </header>
+
+      {/* Top Doctors Section */}
+      <section className="mb-12">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold">Top Rated Doctors</h2>
+          <p className="text-sm text-muted-foreground mt-2">Highly-rated mental health professionals</p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-3">
+          {topDoctors.map((doctor) => (
+            <div key={doctor.id} className="bg-card dark:bg-card rounded-lg shadow-md p-6">
+              <div className="flex items-center gap-4 mb-4">
+                {doctor.avatarUrl && (
+                  <img src={doctor.avatarUrl} alt={doctor.name} className="w-16 h-16 rounded-full object-cover" />
+                )}
+                <div>
+                  <h3 className="font-semibold">{doctor.name}</h3>
+                  <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+                  <p className="text-sm text-muted-foreground">{doctor.city}</p>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1">
+                  <span className="text-yellow-500">⭐</span>
+                  <span className="text-sm font-medium">{doctor.rating}</span>
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {doctor.experienceYears} years exp.
+                </div>
+              </div>
+              <div className="mt-3 text-sm text-muted-foreground">
+                Fees: ₹{doctor.feesINR}
+              </div>
+              <div className="mt-3 text-sm text-muted-foreground">
+                Languages: {doctor.languages}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <section className="grid gap-6 md:grid-cols-3">
         {blogPosts.map((b) => (

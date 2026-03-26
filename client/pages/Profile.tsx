@@ -7,6 +7,7 @@ export default function ProfilePage() {
   const [adminStats, setAdminStats] = useState<{ users: number; doctors: number; bookings: number } | null>(null);
   const [adminUsers, setAdminUsers] = useState<any[]>([]);
   const [adminBookings, setAdminBookings] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<any[]>([]);
 
   const [editing, setEditing] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
@@ -49,10 +50,11 @@ export default function ProfilePage() {
     async function loadAdmin() {
       if (!user || user.role !== "ADMIN") return;
       try {
-        const [statsRes, usersRes, bookingsRes] = await Promise.all([
+        const [statsRes, usersRes, bookingsRes, doctorsRes] = await Promise.all([
           fetchWithAuth("/api/admin/stats"),
           fetchWithAuth("/api/admin/users"),
           fetchWithAuth("/api/admin/bookings"),
+          fetch("/api/doctors"),
         ]);
 
         if (statsRes.ok) {
@@ -66,6 +68,10 @@ export default function ProfilePage() {
         if (bookingsRes.ok) {
           const json = await bookingsRes.json();
           setAdminBookings(json.bookings ?? []);
+        }
+        if (doctorsRes.ok) {
+          const json = await doctorsRes.json();
+          setDoctors(json.doctors ?? []);
         }
       } catch (e) {
         console.error(e);
@@ -101,6 +107,29 @@ export default function ProfilePage() {
 
     await refreshUser();
     setEditing(false);
+  }
+
+  async function deleteDoctor(doctorId: string) {
+    if (!confirm("Are you sure you want to delete this doctor?")) return;
+    
+    try {
+      const res = await fetchWithAuth("/api/doctors", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: doctorId }),
+      });
+      
+      if (res.ok) {
+        setDoctors(doctors.filter(d => d.id !== doctorId));
+        alert("Doctor deleted successfully");
+      } else {
+        const error = await res.json();
+        alert(error.error || "Failed to delete doctor");
+      }
+    } catch (error) {
+      console.error("Delete doctor error:", error);
+      alert("Failed to delete doctor");
+    }
   }
 
   return (
@@ -244,6 +273,36 @@ export default function ProfilePage() {
                   <li className="text-sm text-muted-foreground">No users yet.</li>
                 )}
               </ul>
+            </div>
+
+            <div>
+              <h3 className="font-semibold">Manage Doctors</h3>
+              <div className="mt-3 space-y-2 max-h-64 overflow-y-auto">
+                {doctors.slice(0, 10).map((doctor) => (
+                  <div key={doctor.id} className="rounded-md border p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="text-sm font-medium">{doctor.name}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {doctor.specialty} • {doctor.city} • ⭐ {doctor.rating}
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          ₹{doctor.feesINR} • {doctor.experienceYears} years exp
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => deleteDoctor(doctor.id)}
+                        className="text-red-500 hover:text-red-700 text-sm px-2 py-1 rounded border border-red-300 hover:bg-red-50"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+                {doctors.length === 0 && (
+                  <div className="text-sm text-muted-foreground">No doctors yet.</div>
+                )}
+              </div>
             </div>
           </div>
         ) : (

@@ -25,14 +25,14 @@ export function DoctorCard({ doctor, onBook }: { doctor: Doctor; onBook?: (d: Do
   }
 
   return (
-    <div className="group rounded-2xl overflow-hidden bg-gradient-to-b from-background to-muted/20 shadow-lg transition-transform hover:-translate-y-1 border">
+    <div className="group rounded-2xl overflow-hidden bg-gradient-to-b from-white to-emerald-50 shadow-lg transition-transform hover:-translate-y-1">
       <div className="relative h-40 w-full overflow-hidden">
         <img
           src={doctor.avatarUrl ?? "/placeholder.svg"}
           alt={doctor.name}
           className="h-full w-full object-cover"
         />
-        <div className="absolute left-3 bottom-3 rounded-md bg-background/80 backdrop-blur px-3 py-1 text-sm font-semibold border">{doctor.specialty}</div>
+        <div className="absolute left-3 bottom-3 rounded-md bg-white/80 dark:bg-white/10 px-3 py-1 text-sm font-semibold">{doctor.specialty}</div>
       </div>
       <div className="p-4 grid gap-2">
         <div className="flex items-start gap-3">
@@ -43,7 +43,7 @@ export function DoctorCard({ doctor, onBook }: { doctor: Doctor; onBook?: (d: Do
             </p>
           </div>
           <div className="ml-auto text-right">
-            <div className="text-sm font-bold text-amber-600 dark:text-amber-400">{avg.toFixed(1)} ★</div>
+            <div className="text-sm font-bold text-amber-600">{avg.toFixed(1)} ★</div>
             <div className="text-xs text-muted-foreground">₹{doctor.feesINR}</div>
           </div>
         </div>
