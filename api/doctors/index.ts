@@ -1,9 +1,8 @@
-import { VercelRequest, VercelResponse } from '@vercel/node';
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
@@ -18,6 +17,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    // Log database connection attempt
+    console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+    console.log('Fetching doctors for city:', req.query.city);
+    
     const city = String(req.query.city || "");
     const where = city ? { where: { city } } : {};
     const docs = await prisma.doctor.findMany({
@@ -25,9 +28,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       include: { freeSlots: true },
       orderBy: { rating: "desc" },
     });
+    
+    console.log(`Found ${docs.length} doctors`);
     res.json({ doctors: docs });
   } catch (error) {
     console.error('Doctors fetch error:', error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Database URL length:', process.env.DATABASE_URL?.length || 0);
+    res.status(500).json({ error: "Internal server error", details: String(error) });
   }
 }

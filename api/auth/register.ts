@@ -3,7 +3,13 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL,
+    },
+  },
+});
 const JWT_SECRET = process.env.JWT_SECRET ?? "dev_jwt_secret_change_me";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -23,6 +29,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
+    console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+    console.log('User registration attempt for:', email);
+    
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
       return res.status(409).json({ error: "User already exists" });
@@ -40,6 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
   } catch (error) {
     console.error('Registration error:', error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error('Database URL length:', process.env.DATABASE_URL?.length || 0);
+    res.status(500).json({ error: "Internal server error", details: String(error) });
   }
 }

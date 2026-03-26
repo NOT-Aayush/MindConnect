@@ -35,19 +35,23 @@ export default function DoctorsPage() {
           json = {};
         }
 
-        // start with static seeded doctors matching the city
-        let fileDocs = staticDoctors.filter(d => !city || d.city === city);
+        // prioritize database data over static data
         let list = json.doctors || [];
+        
+        // only add static data if no database data exists
+        if (list.length === 0) {
+          let fileDocs = staticDoctors.filter(d => !city || d.city === city);
+          list = [...fileDocs];
+        }
+        
         // merge local added doctors from localStorage
         try {
           const rawLocal = localStorage.getItem('mc_doctors_v1');
           if (rawLocal) {
             const localDocs = JSON.parse(rawLocal);
-            list = [...localDocs, ...list];
+            list = [...list, ...localDocs];
           }
         } catch {}
-        // put file-based seeded doctors first so UI always shows them in the demo
-        list = [...fileDocs, ...list];
         if (specialty !== "All") list = list.filter((d: any) => d.specialty === specialty);
         setDoctors(list);
       } catch (err) {
