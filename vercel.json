@@ -4,8 +4,8 @@
   "installCommand": "npm install",
   "functions": {
     "api/index.ts": {
-      "runtime": "nodejs18.x",
-      "includeFiles": "{server,shared,prisma}/**"
+      "runtime": "vercel/node",
+      "includeFiles": "server/**"
     }
   },
   "rewrites": [
