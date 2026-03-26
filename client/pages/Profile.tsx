@@ -10,7 +10,7 @@ export default function ProfilePage() {
   const [doctors, setDoctors] = useState<any[]>([]);
   const [doctorsByCity, setDoctorsByCity] = useState<Record<string, number>>({});
   const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
-  const [selectedCity, setSelectedCity] = useState<string | null>(null);
+  const [selectedCity, setSelectedCity] = useState<string | null>("Delhi");
 
   // Auto-hide notification after 3 seconds
   useEffect(() => {
