@@ -11,19 +11,32 @@ export default function StoriesPage() {
     async function fetchData() {
       try {
         setLoading(true);
+        console.log('Fetching data from APIs...');
+        
         const [doctorsRes, blogsRes] = await Promise.all([
           fetch('/api/doctors'),
           fetch('/api/blogs'),
         ]);
 
+        console.log('Doctors response status:', doctorsRes.status);
+        console.log('Blogs response status:', blogsRes.status);
+
         if (doctorsRes.ok) {
           const doctorsJson = await doctorsRes.json();
+          console.log('Doctors data:', doctorsJson);
           setTopDoctors(doctorsJson.doctors?.slice(0, 3) || []);
+        } else {
+          const errorText = await doctorsRes.text();
+          console.error('Doctors API error:', errorText);
         }
 
         if (blogsRes.ok) {
           const blogsJson = await blogsRes.json();
+          console.log('Blogs data:', blogsJson);
           setBlogPosts(blogsJson.blogs || []);
+        } else {
+          const errorText = await blogsRes.text();
+          console.error('Blogs API error:', errorText);
         }
       } catch (error) {
         console.error('Failed to fetch data:', error);

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Seed Database Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 10px; }
+        button:hover { background: #0056b3; }
+        .result { margin: 20px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    </style>
+</head>
+<body>
+    <h1>MindConnect Database Seeding</h1>
+    <p>This page helps you seed sample data into your database.</p>
+    
+    <button onclick="checkData()">Check Current Data</button>
+    <button onclick="seedData()">Seed Sample Data</button>
+    <button onclick="clearData()">Clear All Data</button>
+    
+    <div id="result"></div>
+
+    <script>
+        async function checkData() {
+            try {
+                const response = await fetch('/api/debug/data');
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `
+                    <div class="result info">
+                        <h3>Current Database Status:</h3>
+                        <p>Database Connected: ${data.database.connected}</p>
+                        <p>Doctors: ${data.counts.doctors}</p>
+                        <p>Blogs: ${data.counts.blogs}</p>
+                        <p>Users: ${data.counts.users}</p>
+                        <pre>${JSON.stringify(data.sampleData, null, 2)}</pre>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="result error">
+                        <h3>Error checking data:</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function seedData() {
+            try {
+                const response = await fetch('/api/debug/seed', { method: 'POST' });
+                const data = await response.json();
+                document.getElementById('result').innerHTML = `
+                    <div class="result ${data.success ? 'success' : 'error'}">
+                        <h3>${data.success ? 'Success!' : 'Error!'}</h3>
+                        <p>${data.message || data.error}</p>
+                        ${data.created ? `<p>Created: ${data.created.doctors} doctors, ${data.created.blogs} blogs</p>` : ''}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="result error">
+                        <h3>Error seeding data:</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function clearData() {
+            if (!confirm('Are you sure you want to delete ALL data? This cannot be undone.')) return;
+            
+            try {
+                // This would need to be implemented as a clear endpoint
+                document.getElementById('result').innerHTML = `
+                    <div class="result info">
+                        <h3>Clear Data Feature</h3>
+                        <p>This feature needs to be implemented as a separate API endpoint.</p>
+                        <p>For now, you can manually delete data through your database admin panel.</p>
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `
+                    <div class="result error">
+                        <h3>Error clearing data:</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Auto-check data on page load
+        window.onload = checkData;
+    </script>
+</body>
+</html>

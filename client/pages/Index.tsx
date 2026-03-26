@@ -1,7 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { doctors } from "@/data/doctors";
 import DoctorCard from "@/components/DoctorCard";
-import { blogPosts } from "@/data/blog";
 import { ArrowRight, BookOpen, CalendarDays, Stethoscope, Phone } from "lucide-react";
 import { useLiveListeners } from "@/hooks/use-live-listeners";
 import { useState, useEffect, useRef } from "react";
@@ -13,11 +11,13 @@ export default function Index() {
   const params = new URLSearchParams(location.search);
   const city = params.get("city") ?? "Delhi";
 
-  const featured = doctors.filter((d) => d.city === city).slice(0, 3);
-
   const live = useLiveListeners();
   const [showAssistant, setShowAssistant] = useState(false);
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [doctors, setDoctors] = useState<any[]>([]);
   const coordinator = import.meta.env.VITE_WHATSAPP_COORDINATOR as string | undefined;
+
+  const featured = doctors.filter((d) => d.city === city).slice(0, 3);
   const waAssistLink = (() => {
     if (!coordinator) return null;
     const phone = coordinator.replace(/[^\d]/g, "");
@@ -26,6 +26,30 @@ export default function Index() {
   })();
 
   const parallaxRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [blogsRes, doctorsRes] = await Promise.all([
+          fetch('/api/blogs'),
+          fetch('/api/doctors'),
+        ]);
+        
+        if (blogsRes.ok) {
+          const blogsJson = await blogsRes.json();
+          setBlogPosts(blogsJson.blogs || []);
+        }
+        
+        if (doctorsRes.ok) {
+          const doctorsJson = await doctorsRes.json();
+          setDoctors(doctorsJson.doctors || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    }
+    fetchData();
+  }, []);
 
   useEffect(() => {
     const el = parallaxRef.current;
@@ -223,16 +247,25 @@ export default function Index() {
           <h2 className="text-2xl font-bold">Stories & Insights</h2>
           <p className="text-sm text-muted-foreground">From renowned psychologists and lived experiences</p>
           <div className="mt-6 grid gap-6 md:grid-cols-3">
-            {blogPosts.map((b) => (
-              <article key={b.id} className="rounded-xl border overflow-hidden bg-card">
-                {b.cover && <img src={b.cover} alt="" className="h-40 w-full object-cover" />}
-                <div className="p-4">
-                  <p className="text-xs text-muted-foreground">{new Date(b.date).toLocaleDateString()} • {b.role}</p>
-                  <h3 className="mt-1 text-base font-semibold">{b.title}</h3>
-                  <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{b.excerpt}</p>
-                </div>
-              </article>
-            ))}
+            {blogPosts.length === 0 ? (
+              <div className="col-span-full text-center py-8">
+                <p className="text-muted-foreground">No stories available yet.</p>
+                <p className="text-sm text-muted-foreground mt-2">Check back soon for mental health insights and articles.</p>
+              </div>
+            ) : (
+              blogPosts.slice(0, 3).map((b) => (
+                <article key={b.id} className="rounded-xl border overflow-hidden bg-card">
+                  {b.cover && <img src={b.cover} alt="" className="h-40 w-full object-cover" />}
+                  <div className="p-4">
+                    <p className="text-xs text-muted-foreground">
+                      {new Date(b.createdAt).toLocaleDateString()} • {b.role}
+                    </p>
+                    <h3 className="mt-1 text-base font-semibold">{b.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground line-clamp-3">{b.excerpt}</p>
+                  </div>
+                </article>
+              ))
+            )}
           </div>
         </div>
       </section>
