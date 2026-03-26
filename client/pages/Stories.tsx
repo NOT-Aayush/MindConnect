@@ -34,7 +34,7 @@ export default function StoriesPage() {
         </div>
         <div className="grid gap-6 md:grid-cols-3">
           {topDoctors.map((doctor) => (
-            <div key={doctor.id} className="bg-card dark:bg-card rounded-lg shadow-md p-6">
+            <div key={doctor.id} className="bg-card rounded-lg shadow-md p-6 dark:bg-gray-800 dark:border-gray-700">
               <div className="flex items-center gap-4 mb-4">
                 {doctor.avatarUrl && (
                   <img src={doctor.avatarUrl} alt={doctor.name} className="w-16 h-16 rounded-full object-cover" />
