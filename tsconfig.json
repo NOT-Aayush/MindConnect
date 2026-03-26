@@ -22,14 +22,15 @@
     "paths": {
       "@/*": ["./client/*"],
       "@shared/*": ["./shared/*"],
-      "@api/*": ["./api/*"]   // ✅ optional but useful
+      "@api/*": ["./api/*"]  
     }
   },
   "include": [
     "client/**/*",
     "shared/**/*",
-    "api/**/*",        // ✅ backend now lives here
-    "vite.config.ts"
+    "api/**/*",      
+    "vite.config.ts",
+    "server/**/*"
   ],
   "exclude": ["node_modules", "dist"]
 }
