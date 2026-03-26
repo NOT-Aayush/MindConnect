@@ -1,26 +1,15 @@
 {
-  "version": 2,
-  "builds": [
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist/spa",
+  "installCommand": "npm install",
+  "rewrites": [
     {
-      "src": "dist/server/node-build.mjs",
-      "use": "@vercel/node"
+      "source": "/api/(.*)",
+      "destination": "/api/index"
     },
     {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "dist/spa"
-      }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/dist/server/node-build.mjs"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/dist/spa/$1"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
