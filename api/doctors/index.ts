@@ -47,6 +47,7 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       console.log('DATABASE_URL exists:', !!process.env.DATABASE_URL);
+      console.log('Database URL length:', process.env.DATABASE_URL?.length || 0);
       console.log('Fetching doctors for city:', req.query.city);
       
       const city = String(req.query.city || "");
@@ -58,6 +59,7 @@ export default async function handler(req, res) {
       });
       
       console.log(`Found ${docs.length} doctors`);
+      console.log('Sample doctors:', docs.slice(0, 2));
       res.json({ doctors: docs });
     } catch (error) {
       console.error('Doctors fetch error:', error);
