@@ -35,14 +35,8 @@ export default function DoctorsPage() {
           json = {};
         }
 
-        // prioritize database data over static data
+        // Use only database data
         let list = json.doctors || [];
-        
-        // only add static data if no database data exists
-        if (list.length === 0) {
-          let fileDocs = staticDoctors.filter(d => !city || d.city === city);
-          list = [...fileDocs];
-        }
         
         // merge local added doctors from localStorage
         try {

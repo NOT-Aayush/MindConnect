@@ -40,13 +40,11 @@ export default function AppointmentsPage() {
           console.error("Failed to parse /api/doctors response", e);
           docsJson = {};
         }
-        // merge static seeded doctors first so demo has consistent data
+        // Use only database doctors
         const serverDocs = docsJson.doctors || [];
         setServerDoctors(serverDocs);
-        const fileDocs = staticDoctors.filter(d => !city || d.city === city);
-        const merged = [...fileDocs, ...serverDocs];
-        setDoctors(merged);
-        const sel = doctorId ? merged.find((d: any) => d.id === doctorId) : merged[0];
+        setDoctors(serverDocs);
+        const sel = doctorId ? serverDocs.find((d: any) => d.id === doctorId) : serverDocs[0];
         // If we have a lightweight doctor without freeSlots, fetch detail
         if (sel && (!sel.freeSlots || sel.freeSlots.length === 0)) {
           try {
