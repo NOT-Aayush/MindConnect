@@ -1,0 +1,39 @@
+import { blogPosts } from "@/data/blog";
+
+export default function StoriesPage() {
+  return (
+    <main className="container py-12">
+      <header className="text-center mb-12">
+        <h1 className="text-4xl font-bold">Stories & Insights</h1>
+        <p className="text-sm text-muted-foreground mt-2">Articles from psychologists and lived experiences</p>
+      </header>
+
+      <section className="grid gap-6 md:grid-cols-3">
+        {blogPosts.map((b) => (
+          <article key={b.id} className="bg-card dark:bg-card rounded-lg shadow-md overflow-hidden">
+            {b.cover && (
+              <div className="h-48 w-full overflow-hidden">
+                <img src={b.cover} alt={b.title} className="h-full w-full object-cover" />
+              </div>
+            )}
+            <div className="p-6">
+              <p className="text-xs text-muted-foreground">{new Date(b.date).toLocaleDateString()} • {b.role}</p>
+              <h3 className="mt-2 text-xl font-semibold">{b.title}</h3>
+              <p className="mt-3 text-sm text-muted-foreground line-clamp-4">{b.excerpt}</p>
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="mt-12">
+        <div className="rounded-lg bg-gradient-to-r from-amber-50 to-pink-50 p-8 flex flex-col md:flex-row items-center gap-6">
+          <div className="flex-1">
+            <h2 className="text-2xl font-bold">Featured Stories</h2>
+            <p className="text-sm text-muted-foreground mt-2">Curated reflections and professional guidance</p>
+          </div>
+          <img src="https://cdn.builder.io/api/v1/image/assets%2F2625df872b2144e98726450082600d42%2F898ce96adb6e4d87a6337a6e30d3a54d?format=webp&width=800" className="h-40 rounded-md object-cover" />
+        </div>
+      </section>
+    </main>
+  );
+}
