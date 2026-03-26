@@ -9,6 +9,17 @@ export default function ProfilePage() {
   const [adminBookings, setAdminBookings] = useState<any[]>([]);
   const [doctors, setDoctors] = useState<any[]>([]);
   const [doctorsByCity, setDoctorsByCity] = useState<Record<string, number>>({});
+  const [notification, setNotification] = useState<{ type: 'success' | 'error', message: string } | null>(null);
+
+  // Auto-hide notification after 3 seconds
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const [editing, setEditing] = useState(false);
   const [nameDraft, setNameDraft] = useState("");
@@ -122,14 +133,14 @@ export default function ProfilePage() {
     if (!confirm("Are you sure you want to delete this doctor?")) return;
     
     try {
-      const res = await fetchWithAuth("/api/doctors", {
+      const res = await fetchWithAuth(`/api/admin/doctors/${doctorId}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: doctorId }),
       });
       
       if (res.ok) {
         const deletedDoctor = doctors.find(d => d.id === doctorId);
+        
+        // Update state immediately (no refresh)
         setDoctors(doctors.filter(d => d.id !== doctorId));
         
         // Update city distribution
@@ -144,23 +155,51 @@ export default function ProfilePage() {
           });
         }
         
-        // Also refresh admin stats to update doctor count
+        // Update admin stats
         if (adminStats) {
           setAdminStats(prev => prev ? { ...prev, doctors: prev.doctors - 1 } : null);
         }
-        alert("Doctor deleted successfully");
+        
+        // Show success notification
+        setNotification({ type: 'success', message: 'Doctor deleted successfully' });
       } else {
         const error = await res.json();
-        alert(error.error || "Failed to delete doctor");
+        setNotification({ 
+          type: 'error', 
+          message: error.error || "Failed to delete doctor" 
+        });
       }
     } catch (error) {
       console.error("Delete doctor error:", error);
-      alert("Failed to delete doctor");
+      setNotification({ 
+        type: 'error', 
+        message: "Failed to delete doctor" 
+      });
     }
   }
 
   return (
     <main className="container py-12">
+      {/* Notification Toast */}
+      {notification && (
+        <div className={`fixed top-4 right-4 z-50 p-4 rounded-md shadow-lg transition-all duration-300 ${
+          notification.type === 'success' 
+            ? 'bg-green-500 text-white' 
+            : 'bg-red-500 text-white'
+        }`}>
+          <div className="flex items-center gap-2">
+            <span>{notification.type === 'success' ? '✓' : '✕'}</span>
+            <span>{notification.message}</span>
+            <button 
+              onClick={() => setNotification(null)}
+              className="ml-4 text-lg hover:opacity-70"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="grid gap-6 md:grid-cols-3">
         <div className="rounded-xl border bg-card p-5">
           <div className="flex items-start justify-between gap-3">
